@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pipeline Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .service-card h3 {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .service-card a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .service-card a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .description {
+            margin: 20px 0;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .features {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .features h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .features ul {
+            list-style: none;
+        }
+        
+        .features li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Data Pipeline Manager</h1>
+        
+        <div class="status">
+            <h2>✅ System Status: Running</h2>
+            <p>All services are up and running successfully!</p>
+        </div>
+        
+        <div class="description">
+            <p>Your comprehensive data pipeline management system is now live. 
+            Create, monitor, and manage your data pipelines with ease.</p>
+        </div>
+        
+        <div class="services">
+            <div class="service-card">
+                <h3>📊 Dashboard</h3>
+                <p>Main application interface</p>
+                <a href="http://localhost:3000" target="_blank">Open Dashboard</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🔧 Backend API</h3>
+                <p>RESTful API endpoints</p>
+                <a href="http://localhost:8080/api/actuator/health" target="_blank">Health Check</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>📈 Grafana</h3>
+                <p>Monitoring dashboards</p>
+                <a href="http://localhost:3001" target="_blank">Open Grafana</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>📊 Prometheus</h3>
+                <p>Metrics collection</p>
+                <a href="http://localhost:9090" target="_blank">Open Prometheus</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🗄️ Database</h3>
+                <p>PostgreSQL database</p>
+                <a href="http://localhost:5432" target="_blank">Database Info</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>⚡ Redis</h3>
+                <p>Caching layer</p>
+                <a href="http://localhost:6379" target="_blank">Redis Info</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3>🎯 Key Features Available</h3>
+            <ul>
+                <li>Visual Pipeline Builder with drag-and-drop interface</li>
+                <li>JSON Schema validation and management</li>
+                <li>Data quality monitoring and checks</li>
+                <li>Real-time performance monitoring</li>
+                <li>Comprehensive logging and alerting</li>
+                <li>Scalable cloud-ready architecture</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
+            <p><strong>Default Credentials:</strong></p>
+            <p>Grafana: admin / admin</p>
+            <p>Database: postgres / password</p>
+        </div>
+    </div>
+</body>
+</html> 
