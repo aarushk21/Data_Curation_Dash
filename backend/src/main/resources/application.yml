@@ -2,20 +2,21 @@ spring:
   application:
     name: data-pipeline-manager
   
-  # Database Configuration
+  profiles:
+    active: development
+  
   datasource:
     url: jdbc:postgresql://localhost:5432/pipeline_db
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+    username: postgres
+    password: password
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 20
+      maximum-pool-size: 10
       minimum-idle: 5
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
   
-  # JPA Configuration
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,36 +30,32 @@ spring:
         order_inserts: true
         order_updates: true
   
-  # Security Configuration
-  security:
-    user:
-      name: ${ADMIN_USERNAME:admin}
-      password: ${ADMIN_PASSWORD:admin123}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
   
-  # Jackson Configuration
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: UTC
-    serialization:
-      write-dates-as-timestamps: false
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
   
-  # Cache Configuration
   cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=600s
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
 
-# Server Configuration
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
   servlet:
     context-path: /api
-  compression:
-    enabled: true
-    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
-    min-response-size: 1024
-
-# Management and Monitoring
+  
 management:
   endpoints:
     web:
@@ -68,129 +65,107 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
   metrics:
     export:
       prometheus:
         enabled: true
     tags:
       application: ${spring.application.name}
-      environment: ${ENVIRONMENT:development}
+      environment: ${spring.profiles.active}
 
-# Logging Configuration
 logging:
   level:
-    com.datapipeline: INFO
-    org.springframework.security: DEBUG
+    com.datapipeline: DEBUG
+    org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
     name: logs/application.log
-    max-size: 10MB
-    max-history: 30
 
 # AWS Configuration
 aws:
-  region: ${AWS_REGION:us-east-1}
+  region: us-east-1
   s3:
-    bucket: ${AWS_S3_BUCKET:data-pipeline-storage}
+    bucket-name: data-pipeline-storage
   rds:
-    endpoint: ${AWS_RDS_ENDPOINT:}
-    database: ${AWS_RDS_DATABASE:pipeline_db}
+    endpoint: localhost:5432
   ecs:
-    cluster: ${AWS_ECS_CLUSTER:data-pipeline-cluster}
-    service: ${AWS_ECS_SERVICE:data-pipeline-service}
+    cluster-name: data-pipeline-cluster
 
-# Apache Airflow Configuration
-airflow:
-  host: ${AIRFLOW_HOST:http://localhost:8080}
-  username: ${AIRFLOW_USERNAME:airflow}
-  password: ${AIRFLOW_PASSWORD:airflow}
-  dag-folder: ${AIRFLOW_DAG_FOLDER:/opt/airflow/dags}
-
-# Apache Spark Configuration
-spark:
-  master: ${SPARK_MASTER:local[*]}
-  app-name: ${SPARK_APP_NAME:DataPipelineManager}
-  sql:
-    warehouse-dir: ${SPARK_WAREHOUSE_DIR:/tmp/spark-warehouse}
-
-# Data Quality Configuration
-data-quality:
-  default-threshold: 95.0
-  check-interval: 300000 # 5 minutes
-  alert-enabled: true
-  metrics:
-    retention-days: 30
-
-# Pipeline Configuration
-pipeline:
-  max-concurrent: 10
-  default-timeout: 3600 # 1 hour
-  retry:
-    max-attempts: 3
-    backoff:
-      initial-interval: 1000
-      multiplier: 2.0
-      max-interval: 10000
-
-# Prometheus Configuration
-prometheus:
-  enabled: true
-  endpoint: /actuator/prometheus
-  scrape-interval: 15s
-
-# Development Configuration
-spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+# Application specific configuration
+app:
+  pipeline:
+    max-retries: 3
+    timeout-seconds: 3600
+    default-schedule: "0 0 * * * *"  # Every hour
+  monitoring:
+    enabled: true
+    metrics-interval: 30
+  security:
+    jwt:
+      secret: your-secret-key-here
+      expiration: 86400000  # 24 hours
 
 ---
-# Development Profile
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: development
+  
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/pipeline_db
+    username: postgres
+    password: password
+  
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
+
+logging:
+  level:
+    com.datapipeline: DEBUG
+    org.springframework.web: DEBUG
 
 ---
-# Production Profile
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: production
+  
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
+  
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+  
   jpa:
+    show-sql: false
     hibernate:
       ddl-auto: validate
-    show-sql: false
-  security:
-    user:
-      name: ${ADMIN_USERNAME}
-      password: ${ADMIN_PASSWORD}
 
 logging:
   level:
-    com.datapipeline: WARN
-    org.springframework.security: WARN 
+    com.datapipeline: INFO
+    org.springframework.web: WARN
+
+aws:
+  region: ${AWS_REGION}
+  s3:
+    bucket-name: ${S3_BUCKET_NAME}
+  rds:
+    endpoint: ${RDS_ENDPOINT}
+  ecs:
+    cluster-name: ${ECS_CLUSTER_NAME}
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET} 
